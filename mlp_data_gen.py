@@ -68,16 +68,19 @@ def dict_to_matrix(num_nodes, costs):
         cost_matrix[i,j] = costs[(i, j)]
     return cost_matrix
 
+def ensure_exists(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
 def make_test_set(min_size=10, max_size=30, size_increment=5, num_per_size=25, data_path="./data"):
     """Generates test data and stores it in compressed numpy files on disk. One folder per problem type."""
-
+    ensure_exists(data_path)
     for problem_type, problem_generator in zip(
         ['S0', 'S1', 'S2'],
         [generate_mlp_instance_S0, generate_mlp_instance_S1, generate_mlp_instance_S2]
     ):
         ptype_data_path = os.path.join(data_path, problem_type)
-        if not os.path.exists(ptype_data_path):
-            os.makedirs(ptype_data_path)
+        ensure_exists(ptype_data_path)
         for size in range(min_size, max_size + size_increment, size_increment):
             for index in range(num_per_size):
                 instance_name = f"{size}_{index}.npz"
@@ -88,4 +91,5 @@ def make_test_set(min_size=10, max_size=30, size_increment=5, num_per_size=25, d
 
 
 if __name__ == '__main__':
-    make_test_set()
+    ensure_exists('./data')
+    make_test_set(data_path='./data/test')

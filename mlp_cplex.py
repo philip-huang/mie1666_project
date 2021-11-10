@@ -81,7 +81,7 @@ def solve_model_A(nodes, costs, timelimit=120):
     return (permutation, value)
 
 if __name__ == '__main__':
-    with open('data/S0/10_0.npz', 'rb') as f:
+    with open('data/test/S0/10_0.npz', 'rb') as f:
         fdict = np.load(f)
         nodes, cost_matrix = fdict['nodes'], fdict['cost_matrix']
         

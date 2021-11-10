@@ -19,7 +19,7 @@ def solve_mlp_brute_force(nodes, costs):
             min_cost = cost
     return list(best), min_cost
 
-def test_mlp_model_A(fpath='data/S2/10_0.npz'):
+def test_mlp_model_A(fpath='data/test/S2/10_0.npz'):
     with open(fpath, 'rb') as f:
         fdict = np.load(f)
         nodes, cost_matrix = fdict['nodes'], fdict['cost_matrix']
