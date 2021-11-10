@@ -62,6 +62,12 @@ def generate_mlp_instance_S0(num_nodes, grid_size=100):
     """No service times - this is equivalent to a symmetric TSP instance."""
     return generate_tsp_instance(num_nodes + 1)
 
+def dict_to_matrix(num_nodes, costs):
+    cost_matrix = np.zeros((num_nodes, num_nodes))
+    for i,j in costs:
+        cost_matrix[i,j] = costs[(i, j)]
+    return cost_matrix
+
 def make_test_set(min_size=10, max_size=30, size_increment=5, num_per_size=25, data_path="./data"):
     """Generates test data and stores it in compressed numpy files on disk. One folder per problem type."""
 
@@ -78,7 +84,7 @@ def make_test_set(min_size=10, max_size=30, size_increment=5, num_per_size=25, d
                 file_path = os.path.join(ptype_data_path, instance_name)
                 nodes, costs = problem_generator(size)
                 with open(file_path, "wb") as f:
-                    np.savez(f, nodes=nodes, costs=costs)
+                    np.savez(f, nodes=nodes, cost_matrix=dict_to_matrix(size+1, costs))
 
 
 if __name__ == '__main__':
