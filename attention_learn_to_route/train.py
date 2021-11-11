@@ -11,7 +11,6 @@ from nets.attention_model import set_decode_type
 from utils.log_utils import log_values
 from utils import move_to
 
-
 def get_inner_model(model):
     return model.module if isinstance(model, DataParallel) else model
 
@@ -37,6 +36,7 @@ def rollout(model, dataset, opts):
             cost, _ = model(move_to(bat, opts.device))
         return cost.data.cpu()
 
+    #ipdb.set_trace()
     return torch.cat([
         eval_model_bat(bat)
         for bat
@@ -67,6 +67,7 @@ def clip_grad_norms(param_groups, max_norm=math.inf):
 def train_epoch(model, optimizer, baseline, lr_scheduler, epoch, val_dataset, problem, tb_logger, opts):
     print("Start train epoch {}, lr={} for run {}".format(epoch, optimizer.param_groups[0]['lr'], opts.run_name))
     step = epoch * (opts.epoch_size // opts.batch_size)
+    best_reward = 1e6
     start_time = time.time()
 
     if not opts.no_tensorboard:
@@ -118,6 +119,21 @@ def train_epoch(model, optimizer, baseline, lr_scheduler, epoch, val_dataset, pr
     if not opts.no_tensorboard:
         tb_logger.log_value('val_avg_reward', avg_reward, step)
 
+    if avg_reward < best_reward:
+        best_reward = avg_reward
+        print('Saving best model and state...')
+        torch.save(
+            {
+                'model': get_inner_model(model).state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'rng_state': torch.get_rng_state(),
+                'cuda_rng_state': torch.cuda.get_rng_state_all(),
+                'baseline': baseline.state_dict()
+            },
+            os.path.join(opts.save_dir, 'best.pt')
+        )
+
+
     baseline.epoch_callback(model, epoch)
 
     # lr_scheduler should be called at end of epoch
@@ -135,6 +151,7 @@ def train_batch(
         tb_logger,
         opts
 ):
+    #ipdb.set_trace()
     x, bl_val = baseline.unwrap_batch(batch)
     x = move_to(x, opts.device)
     bl_val = move_to(bl_val, opts.device) if bl_val is not None else None
@@ -143,6 +160,7 @@ def train_batch(
     cost, log_likelihood = model(x)
 
     # Evaluate baseline, get baseline loss if any (only for critic)
+    #ipdb.set_trace()
     bl_val, bl_loss = baseline.eval(x, cost) if bl_val is None else (bl_val, 0)
 
     # Calculate loss

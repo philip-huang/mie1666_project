@@ -64,6 +64,7 @@ class AttentionModel(nn.Module):
         self.is_vrp = problem.NAME == 'cvrp' or problem.NAME == 'sdvrp'
         self.is_orienteering = problem.NAME == 'op'
         self.is_pctsp = problem.NAME == 'pctsp'
+        self.is_mlp = problem.NAME == 'mlp'
 
         self.tanh_clipping = tanh_clipping
 
@@ -90,6 +91,14 @@ class AttentionModel(nn.Module):
             
             if self.is_vrp and self.allow_partial:  # Need to include the demand if split delivery allowed
                 self.project_node_step = nn.Linear(1, 3 * embedding_dim, bias=False)
+
+        elif self.is_mlp:
+            step_context_dim = embedding_dim
+            node_dim = 2
+
+            # Special embedding projection for depot node
+            self.init_embed_depot = nn.Linear(2, embedding_dim)
+
         else:  # TSP
             assert problem.NAME == "tsp", "Unsupported problem: {}".format(problem.NAME)
             step_context_dim = 2 * embedding_dim  # Embedding of first and last node
@@ -215,6 +224,14 @@ class AttentionModel(nn.Module):
                         input['loc'],
                         *(input[feat][:, :, None] for feat in features)
                     ), -1))
+                ),
+                1
+            )
+        elif self.is_mlp:
+            return torch.cat(
+                (
+                    self.init_embed_depot(input['depot'])[:, None, :],
+                    self.init_embed(input['loc'])
                 ),
                 1
             )
@@ -422,6 +439,14 @@ class AttentionModel(nn.Module):
                 ),
                 -1
             )
+        elif self.is_mlp:
+            return torch.gather(
+                embeddings,
+                1,
+                current_node.contiguous()
+                    .view(batch_size, num_steps, 1)
+                    .expand(batch_size, num_steps, embeddings.size(-1))
+            ).view(batch_size, num_steps, embeddings.size(-1))
         else:  # TSP
         
             if num_steps == 1:  # We need to special case if we have only 1 step, may be the first or not
