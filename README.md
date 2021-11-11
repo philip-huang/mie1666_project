@@ -9,7 +9,7 @@ Install the tsplib95 package via `pip install tsplib95`. The `tsplib.py` has hel
 
 ### Training with RL + GNN 
 
-For training MLD instances with 5 nodes and using rollout as REINFORCE baseline:
+For training MLP instances with 5 nodes and using rollout as REINFORCE baseline:
 ```bash
 cd attention_learn_to_route
 python run.py --graph_size 5 --baseline rollout --run_name 'mlp_5_rollout' --problem 'mlp'
