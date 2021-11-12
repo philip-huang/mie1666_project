@@ -4,6 +4,16 @@ import numpy as np
 from utils.data_utils import check_extension, save_dataset
 
 
+def generate_mlp_data(dataset_size, mlp_size):
+    depot = np.random.uniform(size=(dataset_size, 2))
+    loc = np.random.uniform(size=(dataset_size, mlp_size-1, 2))
+
+    return list(zip(
+        depot.tolist(),
+        loc.tolist(),
+    ))
+
+
 def generate_tsp_data(dataset_size, tsp_size):
     return np.random.uniform(size=(dataset_size, tsp_size, 2)).tolist()
 
@@ -116,6 +126,7 @@ if __name__ == "__main__":
         "Can only specify filename when generating a single dataset"
 
     distributions_per_problem = {
+        'mlp': [None],
         'tsp': [None],
         'vrp': [None],
         'pctsp': [None],
@@ -152,6 +163,8 @@ if __name__ == "__main__":
                 np.random.seed(opts.seed)
                 if problem == 'tsp':
                     dataset = generate_tsp_data(opts.dataset_size, graph_size)
+                elif problem == 'mlp':
+                    dataset = generate_mlp_data(opts.dataset_size, graph_size)
                 elif problem == 'vrp':
                     dataset = generate_vrp_data(
                         opts.dataset_size, graph_size)
