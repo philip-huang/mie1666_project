@@ -58,15 +58,16 @@ def create_model_A(nodes, costs):
 
     return mdl
 
-def parse_solution_model_A(nodes, solution):
+def parse_solution_model_A(solution):
     solution_values = solution.as_name_dict()
     permutation = []
-    for k in range(1, len(nodes)):
-        for i in range(1, len(nodes)):
-            if solution_values.get(f"x_{i}_{k}", 0) == 1:
-                permutation.append(i)
-                break
-    return permutation
+    for var_name in solution_values:
+        if var_name.startswith('x'):
+            _, node, index = var_name.split('_')
+            permutation.append((index, node))
+    _, nodes = zip(*sorted(permutation))
+    return nodes
+
 
 def solve_model_A(nodes, costs, timelimit=120):
     model = create_model_A(nodes, costs)
