@@ -76,7 +76,7 @@ def ensure_exists(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-def make_test_set(min_size=10, max_size=30, size_increment=5, num_per_size=25, data_path="./data"):
+def make_test_set(min_size=50, max_size=100, size_increment=50, num_per_size=25, data_path="./data"):
     """Generates test data and stores it in compressed numpy files on disk. One folder per problem type."""
     ensure_exists(data_path)
     for problem_type, problem_generator in zip(
@@ -101,9 +101,11 @@ def load_mlp_instance_from_fpath(fpath):
     with open(fpath, 'rb') as f:
         fdict = np.load(f)
         nodes, cost_matrix = fdict['nodes'], fdict['cost_matrix']
+        print(cost_matrix)
     return nodes, cost_matrix
 
 
 if __name__ == '__main__':
     ensure_exists('./data')
+    load_mlp_instance_from_fpath('./data/test-optimal/S0/10_2.npz')
     make_test_set(data_path='./data/test-optimal')
