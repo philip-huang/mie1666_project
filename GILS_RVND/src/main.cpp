@@ -590,7 +590,7 @@ vector <int> construction(vector <int> candidatesList, double alpha){
   return initialSolution;
 }
 
-double search(int iIls, int dimension){
+double search(int iIls, int dimension, ofstream &fout){
   double bestCurrentCost = DBL_MAX, currentCost, finalCost = DBL_MAX;
   vector <int> vertices, bestCurrentSolution, currentSolution, finalSolution;
   vector <vector <subsequenceInfo>> subsequenceMatrix(dimension+1, vector <subsequenceInfo> (dimension+1));
@@ -633,8 +633,9 @@ double search(int iIls, int dimension){
   }
 
   cout << endl << "Solution: ";
-  for(int i = 0; i < finalSolution.size(); i++){
-    cout << finalSolution[i] << " ";
+  for(int i = 1; i < finalSolution.size() - 1; i++){
+    cout << finalSolution[i] - 1 << " ";
+    fout << finalSolution[i] - 1 << "\n";
   }
 
   return finalCost;  
@@ -656,7 +657,12 @@ int main(int argc, char** argv) {
     iIls = dimension;
   }
 
-  double cost = search(iIls, dimension);
+  ofstream fout;
+  string filename (argv[1]);;
+  filename.append(".gilsrvndSol.txt");
+  fout.open(filename);
+
+  double cost = search(iIls, dimension, fout);
 
   // Ends time counting
   clock_t end = clock();
@@ -664,6 +670,8 @@ int main(int argc, char** argv) {
 
   cout << endl << "Cost: " << cost << endl;
   cout << "Time: " << time << endl << endl;
+  fout << cost << endl;
+  fout << time << endl;
     
   return 0;
 

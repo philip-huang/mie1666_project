@@ -43,9 +43,9 @@ void readNpData( int argc, char** argv, int* Dimension, double ***Mdist ) {
             else {
                 dist[i+1][j+1] = loaded_data[i * N + j];
             }
-            std::cout << dist[i+1][j+1] << " ";
+            // std::cout << dist[i+1][j+1] << " ";
         }
-        std::cout << std::endl;
+        // std::cout << std::endl;
     }
 
     for (int i = 1; i < N + 1; i++) {

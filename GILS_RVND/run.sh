@@ -5,17 +5,11 @@ echo "--MLP Benchmark--"
 make
 
 k=1
-for instance in instances/*; do
-	echo $instance >> ./benchmark/bm.txt
-
+for instance in ../data/test-optimal/S0/*.npz; do
 	echo "Running $instance"
-	echo "Instance $k of 23" 
+	echo "Instance $k"
 
-	for i in {1..10}; do
-		./tsp ${instance} | grep 'Custo\|Tempo' | awk "{print $1}" >> ./benchmark/bm.txt
-	done
+	./mlp ${instance}
 
 	k=$(($k + 1))
 done
-
-echo "-" >> ./benchmark/bm.txt
