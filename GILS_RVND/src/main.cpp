@@ -265,7 +265,7 @@ void updatesMatrix(vector <vector <subsequenceInfo>> &subsequenceMatrix, vector 
         subsequenceMatrix[i][j].totalTime = 0;
       }else {
         subsequenceMatrix[i][j].totalTime = subsequenceMatrix[i][j-1].totalTime + distanceMatrix[solution[j-1]][solution[j]];
-        subsequenceMatrix[j][i].totalTime = subsequenceMatrix[i][j].totalTime;  
+        subsequenceMatrix[j][i].totalTime = subsequenceMatrix[j-1][i].totalTime + distanceMatrix[solution[j]][solution[j-1]];  
       }
     }
   }
@@ -564,7 +564,7 @@ vector <int> construction(vector <int> candidatesList, double alpha){
 
     for(int i = 0, j = 1, k = 0; i < initialSolution.size()-1; i++, j++){
       for(auto l : candidatesList){
-        insertionCost[k].cost = distanceMatrix[initialSolution[i]][l] + distanceMatrix[initialSolution[j]][l] - distanceMatrix[initialSolution[i]][initialSolution[j]];
+        insertionCost[k].cost = distanceMatrix[initialSolution[i]][l] + distanceMatrix[l][initialSolution[j]] - distanceMatrix[initialSolution[i]][initialSolution[j]];
         insertionCost[k].insertedNode = l;
         insertionCost[k].deletedEdge = i;
         k++;
