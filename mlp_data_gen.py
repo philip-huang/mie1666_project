@@ -133,14 +133,17 @@ def convert_mlp_dataset_format(folder_path, graph_size, output_folder):
             locs.append(coords[1:].tolist())
 
         # Read soln data
-        with open(fpath + '.solution.txt', 'r') as f:
-            lines = f.readlines()
-            cost = float(lines[-2].strip())
-            soln_costs.append(cost)
+        soln_path = fpath + '.solution.txt'
+        if os.path.exists(soln_path):
+            with open(soln_path, 'r') as f:
+                lines = f.readlines()
+                cost = float(lines[-2].strip())
+                soln_costs.append(cost)
 
     dataset = list(zip(depots, locs))
     save_dataset(dataset, os.path.join(output_folder, 'mlp{}_s0_test.pkl'.format(graph_size+1)))
-    save_dataset(soln_costs, os.path.join(output_folder, 'mlp{}_s0_test_optimcosts.pkl'.format(graph_size+1)))
+    if len(soln_costs) != 0:
+        save_dataset(soln_costs, os.path.join(output_folder, 'mlp{}_s0_test_optimcosts.pkl'.format(graph_size+1)))
 
 
 if __name__ == '__main__':
@@ -150,4 +153,4 @@ if __name__ == '__main__':
     #nodes, cost_matrix, coords = load_mlp_instance_from_fpath('./data/test-optimal/S0/10_0.npz')
 
     # for converting generated data to format readable by RL code
-    #convert_mlp_dataset_format('./data/test-optimal/S0', 30, './attention_learn_to_route/data/')
+    #convert_mlp_dataset_format('./data/test-optimal/S0', 100, './attention_learn_to_route/data/')
