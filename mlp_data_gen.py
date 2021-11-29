@@ -3,6 +3,10 @@ Problem classifications are obtained from https://www.sciencedirect.com/science/
 
 import numpy as np
 import os
+
+import glob
+from attention_learn_to_route.utils.data_utils import save_dataset
+
 np.random.seed(1)
 
 def generate_tsp_instance(num_nodes, grid_size=1):
@@ -100,10 +104,50 @@ def make_test_set(min_size=10, max_size=30, size_increment=5, num_per_size=25, d
 def load_mlp_instance_from_fpath(fpath):
     with open(fpath, 'rb') as f:
         fdict = np.load(f)
-        nodes, cost_matrix = fdict['nodes'], fdict['cost_matrix']
-    return nodes, cost_matrix
+        nodes, cost_matrix, coords = fdict['nodes'], fdict['cost_matrix'], fdict['coords']
+    return nodes, cost_matrix, coords
+
+
+def convert_mlp_dataset_format(folder_path, graph_size, output_folder):
+    ''' Example call:
+        convert_mlp_dataset_format('./data/test-optimal/S0', 30,
+                                   './attention_learn_to_route/data/')
+    '''
+
+    depots = []
+    locs = []
+    soln_costs = []
+
+    for fpath in sorted(glob.glob(os.path.join(folder_path, "{}*.npz".format(graph_size)))):
+
+        # Read input data
+        with open(fpath, 'rb') as f:
+            fdict = np.load(f)
+            nodes, cost_matrix, coords = fdict['nodes'], fdict['cost_matrix'], fdict['coords']
+
+            #print(coords)
+            #print(coords.shape)
+
+            coords = coords.T
+            depots.append(coords[0].tolist())
+            locs.append(coords[1:].tolist())
+
+        # Read soln data
+        with open(fpath + '.solution.txt', 'r') as f:
+            lines = f.readlines()
+            cost = float(lines[-2].strip())
+            soln_costs.append(cost)
+
+    dataset = list(zip(depots, locs))
+    save_dataset(dataset, os.path.join(output_folder, 'mlp{}_s0_test.pkl'.format(graph_size+1)))
+    save_dataset(soln_costs, os.path.join(output_folder, 'mlp{}_s0_test_optimcosts.pkl'.format(graph_size+1)))
 
 
 if __name__ == '__main__':
     ensure_exists('./data')
-    make_test_set(data_path='./data/test-optimal')
+    #make_test_set(data_path='./data/test-optimal')
+
+    #nodes, cost_matrix, coords = load_mlp_instance_from_fpath('./data/test-optimal/S0/10_0.npz')
+
+    # for converting generated data to format readable by RL code
+    #convert_mlp_dataset_format('./data/test-optimal/S0', 30, './attention_learn_to_route/data/')
