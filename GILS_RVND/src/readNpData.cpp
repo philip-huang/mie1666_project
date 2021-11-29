@@ -28,7 +28,7 @@ void readNpData( int argc, char** argv, int* Dimension, double ***Mdist ) {
     int M = arr.shape[1];
     assert(N == M);
 
-    *Dimension = N;
+    *Dimension = N-1;
     double **dist = new double*[N+1];
     
     for ( int i = 1; i < N + 1; i++ ) {

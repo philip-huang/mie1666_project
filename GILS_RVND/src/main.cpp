@@ -417,6 +417,11 @@ void RVND(vector <int> &solution, vector <vector <subsequenceInfo>> &subsequence
 
       }      
     }
+    // double cost = subsequenceMatrix[0][dimension].acumulateCost;
+    // cout << endl << "RVND " << choosen << " Solution: " << cost << " ";
+    // for(int i = 1; i < solution.size(); i++){
+    //   cout << solution[i] - 1 << " ";
+    // } 
   }
 }
 
@@ -546,7 +551,6 @@ vector <int> construction(vector <int> candidatesList, double alpha){
 
   // Insert depot
   initialSolution.push_back(candidatesList[0]);
-  initialSolution.push_back(candidatesList[0]);
 
   // Deletes it from candidates list
   candidatesList.erase(candidatesList.begin());
@@ -575,6 +579,8 @@ vector <int> construction(vector <int> candidatesList, double alpha){
     sort(insertionCost.begin(), insertionCost.end(), compares);
 
     int elements = alpha * insertionCost.size();
+    if (elements == 0)
+      elements = 1;
     int i = rand() % elements;
 
     // Inserts choosen node
@@ -596,7 +602,7 @@ double search(int iIls, int dimension, ofstream &fout){
   vector <vector <subsequenceInfo>> subsequenceMatrix(dimension+1, vector <subsequenceInfo> (dimension+1));
 
   // Creates vector with vertices
-  for(int i = 0; i < dimension; i++){
+  for(int i = 0; i < dimension+1; i++){
     vertices.push_back(i+1);
   }
 
@@ -633,7 +639,7 @@ double search(int iIls, int dimension, ofstream &fout){
   }
 
   cout << endl << "Solution: ";
-  for(int i = 1; i < finalSolution.size() - 1; i++){
+  for(int i = 1; i < finalSolution.size(); i++){
     cout << finalSolution[i] - 1 << " ";
     fout << finalSolution[i] - 1 << "\n";
   }
