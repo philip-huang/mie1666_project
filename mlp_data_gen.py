@@ -80,7 +80,7 @@ def ensure_exists(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-def make_test_set(min_size=10, max_size=30, size_increment=5, num_per_size=25, data_path="./data"):
+def make_test_set(min_size=50, max_size=100, size_increment=50, num_per_size=25, data_path="./data"):
     """Generates test data and stores it in compressed numpy files on disk. One folder per problem type."""
     ensure_exists(data_path)
     for problem_type, problem_generator in zip(
