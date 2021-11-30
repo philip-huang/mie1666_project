@@ -1,11 +1,15 @@
 # mie1666_project
 
-Solve the minimum latency problem (MLP) with graph neural networks + RL
+Solve the minimum latency problem (MLP) with graph neural networks + RL. Group work by 
 
-## Prepare data
-Run `bash prep_data.sh` to download the tsplib data
+[Mohamed Khodier](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiCg52Il8H0AhWqmmoFHWFzAYUQFnoECAIQAQ&url=https%3A%2F%2Fca.linkedin.com%2Fin%2Fkhodeir&usg=AOvVaw0PqoSOEBoF8mMYZkNqFHah)
 
-Install the tsplib95 package via `pip install tsplib95`. The `tsplib.py` has helper function to load the data as *tsplib* problem instances and *networkx* graphs.
+[Salar Hosseini Khorasgani](https://salarios77.github.io/)
+
+[Siqi Hao](https://rvl.cs.toronto.edu/team/)
+
+[Philip Huang](https://philip-huang.github.io/)
+
 
 ### Training with RL + GNN 
 
@@ -28,4 +32,20 @@ python eval.py data/mlp/mlp20_test_seed1234.pkl --model outputs/mlp_20/mlp_20_ro
 #Sampling-based decoding with 1280 solutions sampled
 python eval.py data/mlp/mlp20_test_seed1234.pkl --model outputs/mlp_20/mlp_20_rollout_20211112T120056/epoch-X.pt --decode_strategy sample --width 1280 --eval_batch_size 1
 ```
+
+### Run GILS-RVND
+
+To run gils-rvnd baseline, we have provided a compiled binary on Linux and a script to evaluate the results for all instances.
+```
+cd GILS-RVND
+./run.sh
+```
+
+### Citations
+This repo is based on the attention learning-to-route [repo](https://github.com/wouterkool/attention-learn-to-route).
+
+[1]  W. Kool, H. van Hoof, and M. Welling, “Attention, learn to solve routing problems!” 2019
+
+The GILS-RVND implementation is based on the mlp [repo](https://github.com/renatamendesc/MLP)
+
 
