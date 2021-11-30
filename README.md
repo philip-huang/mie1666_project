@@ -2,7 +2,7 @@
 
 Solve the minimum latency problem (MLP) with graph neural networks + RL. Group work by 
 
-[Mohamed Khodier](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiCg52Il8H0AhWqmmoFHWFzAYUQFnoECAIQAQ&url=https%3A%2F%2Fca.linkedin.com%2Fin%2Fkhodeir&usg=AOvVaw0PqoSOEBoF8mMYZkNqFHah)
+[Mohamed Khodier](https://khodeir.github.io/)
 
 [Salar Hosseini Khorasgani](https://salarios77.github.io/)
 
