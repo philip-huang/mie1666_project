@@ -195,8 +195,8 @@ class MLPDataset_S1(Dataset):
             distances = {(i, j): torch.hypot(loc_with_depot[i, 0] - loc_with_depot[j, 0], loc_with_depot[i, 1] - loc_with_depot[j, 1]) for i in nodes for j in nodes if i != j}
             #d_norm = (loc_with_depot[1:] - loc_with_depot[:-1]).norm(p=2, dim=1)
             max_service_time = (max(distances.values()) - min(distances.values()))/2
-            #service_times = torch.rand(size-1) * max_service_time
-            service_times = torch.zeros(size-1)
+            service_times = torch.rand(size-1) * max_service_time
+            #service_times = torch.zeros(size-1)
 
 
             self.data = [
