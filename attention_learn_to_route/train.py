@@ -10,6 +10,7 @@ from torch.nn import DataParallel
 from nets.attention_model import set_decode_type
 from utils.log_utils import log_values
 from utils import move_to
+import ipdb
 
 def get_inner_model(model):
     return model.module if isinstance(model, DataParallel) else model
@@ -64,10 +65,9 @@ def clip_grad_norms(param_groups, max_norm=math.inf):
     return grad_norms, grad_norms_clipped
 
 
-def train_epoch(model, optimizer, baseline, lr_scheduler, epoch, val_dataset, problem, tb_logger, opts):
+def train_epoch(model, optimizer, baseline, lr_scheduler, epoch, val_dataset, problem, tb_logger, opts, best_reward):
     print("Start train epoch {}, lr={} for run {}".format(epoch, optimizer.param_groups[0]['lr'], opts.run_name))
     step = epoch * (opts.epoch_size // opts.batch_size)
-    best_reward = 1e6
     start_time = time.time()
 
     if not opts.no_tensorboard:
@@ -138,6 +138,8 @@ def train_epoch(model, optimizer, baseline, lr_scheduler, epoch, val_dataset, pr
 
     # lr_scheduler should be called at end of epoch
     lr_scheduler.step()
+
+    return best_reward
 
 
 def train_batch(

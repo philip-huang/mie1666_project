@@ -151,11 +151,13 @@ def run(opts):
         print("Resuming after {}".format(epoch_resume))
         opts.epoch_start = epoch_resume + 1
 
+    best_reward = 1e6
+
     if opts.eval_only:
         validate(model, val_dataset, opts)
     else:
         for epoch in range(opts.epoch_start, opts.epoch_start + opts.n_epochs):
-            train_epoch(
+            best_reward = train_epoch(
                 model,
                 optimizer,
                 baseline,
@@ -164,7 +166,8 @@ def run(opts):
                 val_dataset,
                 problem,
                 tb_logger,
-                opts
+                opts,
+                best_reward
             )
 
 

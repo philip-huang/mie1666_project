@@ -10,7 +10,6 @@ from torch.nn import DataParallel
 from utils.beam_search import CachedLookup
 from utils.functions import sample_many
 
-
 def set_decode_type(model, decode_type):
     if isinstance(model, DataParallel):
         model = model.module
@@ -65,6 +64,7 @@ class AttentionModel(nn.Module):
         self.is_orienteering = problem.NAME == 'op'
         self.is_pctsp = problem.NAME == 'pctsp'
         self.is_mlp = problem.NAME == 'mlp'
+        self.is_mlp_directed = problem.NAME == 'mlp_s1' or problem.NAME == 'mlp_s2'
 
         self.tanh_clipping = tanh_clipping
 
@@ -95,6 +95,13 @@ class AttentionModel(nn.Module):
         elif self.is_mlp:
             step_context_dim = embedding_dim
             node_dim = 2
+
+            # Special embedding projection for depot node
+            self.init_embed_depot = nn.Linear(2, embedding_dim)
+
+        elif self.is_mlp_directed:
+            step_context_dim = embedding_dim
+            node_dim = 3  # x, y, service_time
 
             # Special embedding projection for depot node
             self.init_embed_depot = nn.Linear(2, embedding_dim)
@@ -232,6 +239,18 @@ class AttentionModel(nn.Module):
                 (
                     self.init_embed_depot(input['depot'])[:, None, :],
                     self.init_embed(input['loc'])
+                ),
+                1
+            )
+        elif self.is_mlp_directed:
+            features = ('service_time', )
+            return torch.cat(
+                (
+                    self.init_embed_depot(input['depot'])[:, None, :],
+                    self.init_embed(torch.cat((
+                        input['loc'],
+                        *(input[feat][:, 1:, None] for feat in features)
+                    ), -1))
                 ),
                 1
             )
@@ -439,7 +458,7 @@ class AttentionModel(nn.Module):
                 ),
                 -1
             )
-        elif self.is_mlp:
+        elif self.is_mlp or self.is_mlp_directed:
             return torch.gather(
                 embeddings,
                 1,
