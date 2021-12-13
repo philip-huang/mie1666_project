@@ -9,6 +9,9 @@ from utils.beam_search import beam_search
 import numpy as np
 import ipdb
 
+
+from sklearn.metrics.pairwise import euclidean_distances
+
 class MLP(object):
 
     NAME = 'mlp'  # Split Delivery Vehicle Routing Problem
@@ -187,18 +190,32 @@ class MLPDataset_S1(Dataset):
 
         else:
 
-            nodes = list(range(size))
             self.data = []
-            for i in range(num_samples):
+
+            for k in range(num_samples):
+                #if k%100 == 0:
+                #    print('{}/{}'.format(k,num_samples))
+
                 loc = torch.FloatTensor(size-1, 2).uniform_(0, 1)
                 depot = torch.FloatTensor(2).uniform_(0, 1) 
-    
                 loc_with_depot = torch.cat((depot[None, :], loc),  0)
-                distances = {(i, j): torch.hypot(loc_with_depot[i, 0] - loc_with_depot[j, 0], loc_with_depot[i, 1] - loc_with_depot[j, 1]) for i in nodes for j in nodes if i != j}
+
+                distances = euclidean_distances(loc_with_depot, loc_with_depot)
+                max_dist = np.amax(distances)
+                np.fill_diagonal(distances, float('inf')) #fill diag with inf after getting max so min is not 0
+                min_dist = np.amin(distances)
+
                 #d_norm = (loc_with_depot[1:] - loc_with_depot[:-1]).norm(p=2, dim=1)
-                max_service_time = (max(distances.values()) - min(distances.values()))/2
+                max_service_time = (max_dist - min_dist)/2
                 service_times = torch.rand(size-1) * max_service_time
-                self.data.append({'loc': loc, 'depot': depot, 'service_time': torch.cat([torch.zeros(1), service_times], dim=0)})
+                #service_times = torch.zeros(size-1)
+
+                self.data.append({
+                                    'loc': loc,
+                                    'depot': depot,
+                                    'service_time': torch.cat([torch.zeros(1), service_times], dim=0)
+                                 })
+
 
         self.size = len(self.data)
 
@@ -224,31 +241,30 @@ class MLPDataset_S2(Dataset):
 
         else:
 
-            nodes = list(range(size))
             self.data = []
+
             for i in range(num_samples):
+
                 loc = torch.FloatTensor(size-1, 2).uniform_(0, 1)
                 depot = torch.FloatTensor(2).uniform_(0, 1) 
-    
+
                 loc_with_depot = torch.cat((depot[None, :], loc),  0)
-                distances = {(i, j): torch.hypot(loc_with_depot[i, 0] - loc_with_depot[j, 0], loc_with_depot[i, 1] - loc_with_depot[j, 1]) for i in nodes for j in nodes if i != j}
                 #d_norm = (loc_with_depot[1:] - loc_with_depot[:-1]).norm(p=2, dim=1)
-    
-                tmax, tmin = max(distances.values()), min(distances.values())
+
+                distances = euclidean_distances(loc_with_depot, loc_with_depot)
+                tmax = np.amax(distances)
+                np.fill_diagonal(distances, float('inf')) #fill diag with inf after getting max so min is not 0
+                tmin = np.amin(distances)
+
                 min_service_time = (tmax + tmin)/2
                 max_service_time = (3*tmax - tmin)/2
                 service_times = min_service_time + torch.rand(size-1) * (max_service_time - min_service_time)
-                self.data.append({'loc': loc, 'depot': depot, 'service_time': torch.cat([torch.zeros(1), service_times], dim=0)})
 
-
-#            self.data = [
-#                {
-#                    'loc': loc,
-#                    'depot': depot,
-#                    'service_time': torch.cat([torch.zeros(1), service_times], dim=0)
-#                }
-#                for i in range(num_samples)
-#            ]
+                self.data.append({
+                                    'loc': loc,
+                                    'depot': depot,
+                                    'service_time': torch.cat([torch.zeros(1), service_times], dim=0)
+                                 })
 
         self.size = len(self.data)
 
