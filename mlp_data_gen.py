@@ -6,6 +6,7 @@ import os
 
 import glob
 from attention_learn_to_route.utils.data_utils import save_dataset
+import torch
 
 np.random.seed(1)
 
@@ -146,11 +147,56 @@ def convert_mlp_dataset_format(folder_path, graph_size, output_folder):
         save_dataset(soln_costs, os.path.join(output_folder, 'mlp{}_s0_test_optimcosts.pkl'.format(graph_size+1)))
 
 
+def convert_mlp_directed_dataset_format(folder_path, graph_size, output_folder):
+    ''' Example call:
+        convert_mlp_dataset_format('./data/test-optimal/S0', 30,
+                                   './attention_learn_to_route/data/')
+    '''
+
+    depots = []
+    locs = []
+    service_times = []
+    soln_costs = []
+
+    for fpath in sorted(glob.glob(os.path.join(folder_path, "{}_*.npz".format(graph_size)))):
+
+        # Read input data
+        with open(fpath, 'rb') as f:
+            fdict = np.load(f)
+            nodes, cost_matrix, coords = fdict['nodes'], fdict['cost_matrix'], fdict['coords']
+
+
+            coords = coords.T
+            coord_x = coords[:, 0]
+            coord_y = coords[:, 1]
+            distances = {(i, j): np.hypot(coord_x[i] - coord_x[j], coord_y[i] - coord_y[j]) for i in nodes for j in nodes if i != j}
+            service_time = {(i, j): cost_matrix[(i, j)] - distances[(i, j)] for (i,j) in distances}
+            service_time = np.array(list(service_time.values())).reshape(graph_size+1, -1)[:, 0]
+            depots.append(coords[0].tolist())
+            locs.append(coords[1:].tolist())
+            service_times.append(service_time)
+
+        # Read soln data
+        soln_path = fpath + '.solution.txt'
+        if os.path.exists(soln_path):
+            with open(soln_path, 'r') as f:
+                lines = f.readlines()
+                cost = float(lines[-2].strip())
+                soln_costs.append(cost)
+    
+    dataset = list(zip(depots, locs, service_times))
+
+    save_dataset(dataset, os.path.join(output_folder, 'mlp{}_s1_test.pkl'.format(graph_size+1)))
+    if len(soln_costs) != 0:
+        save_dataset(soln_costs, os.path.join(output_folder, 'mlp{}_s1_test_optimcosts.pkl'.format(graph_size+1)))
+
+
 if __name__ == '__main__':
     ensure_exists('./data')
     #make_test_set(data_path='./data/test-optimal')
 
-    #nodes, cost_matrix, coords = load_mlp_instance_from_fpath('./data/test-optimal/S0/10_0.npz')
+    nodes, cost_matrix, coords = load_mlp_instance_from_fpath('./data/test-optimal/S1/10_0.npz')
 
     # for converting generated data to format readable by RL code
     #convert_mlp_dataset_format('./data/test-optimal/S0', 100, './attention_learn_to_route/data/')
+    convert_mlp_directed_dataset_format('./data/test-optimal/S1', 10, './attention_learn_to_route/data/')
