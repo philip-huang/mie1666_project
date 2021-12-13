@@ -188,25 +188,17 @@ class MLPDataset_S1(Dataset):
         else:
 
             nodes = list(range(size))
-            loc = torch.FloatTensor(size-1, 2).uniform_(0, 1)
-            depot = torch.FloatTensor(2).uniform_(0, 1) 
-
-            loc_with_depot = torch.cat((depot[None, :], loc),  0)
-            distances = {(i, j): torch.hypot(loc_with_depot[i, 0] - loc_with_depot[j, 0], loc_with_depot[i, 1] - loc_with_depot[j, 1]) for i in nodes for j in nodes if i != j}
-            #d_norm = (loc_with_depot[1:] - loc_with_depot[:-1]).norm(p=2, dim=1)
-            max_service_time = (max(distances.values()) - min(distances.values()))/2
-            service_times = torch.rand(size-1) * max_service_time
-            #service_times = torch.zeros(size-1)
-
-
-            self.data = [
-                {
-                    'loc': loc,
-                    'depot': depot,
-                    'service_time': torch.cat([torch.zeros(1), service_times], dim=0)
-                }
-                for i in range(num_samples)
-            ]
+            self.data = []
+            for i in range(num_samples):
+                loc = torch.FloatTensor(size-1, 2).uniform_(0, 1)
+                depot = torch.FloatTensor(2).uniform_(0, 1) 
+    
+                loc_with_depot = torch.cat((depot[None, :], loc),  0)
+                distances = {(i, j): torch.hypot(loc_with_depot[i, 0] - loc_with_depot[j, 0], loc_with_depot[i, 1] - loc_with_depot[j, 1]) for i in nodes for j in nodes if i != j}
+                #d_norm = (loc_with_depot[1:] - loc_with_depot[:-1]).norm(p=2, dim=1)
+                max_service_time = (max(distances.values()) - min(distances.values()))/2
+                service_times = torch.rand(size-1) * max_service_time
+                self.data.append({'loc': loc, 'depot': depot, 'service_time': torch.cat([torch.zeros(1), service_times], dim=0)})
 
         self.size = len(self.data)
 
@@ -233,27 +225,30 @@ class MLPDataset_S2(Dataset):
         else:
 
             nodes = list(range(size))
-            loc = torch.FloatTensor(size-1, 2).uniform_(0, 1)
-            depot = torch.FloatTensor(2).uniform_(0, 1) 
+            self.data = []
+            for i in range(num_samples):
+                loc = torch.FloatTensor(size-1, 2).uniform_(0, 1)
+                depot = torch.FloatTensor(2).uniform_(0, 1) 
+    
+                loc_with_depot = torch.cat((depot[None, :], loc),  0)
+                distances = {(i, j): torch.hypot(loc_with_depot[i, 0] - loc_with_depot[j, 0], loc_with_depot[i, 1] - loc_with_depot[j, 1]) for i in nodes for j in nodes if i != j}
+                #d_norm = (loc_with_depot[1:] - loc_with_depot[:-1]).norm(p=2, dim=1)
+    
+                tmax, tmin = max(distances.values()), min(distances.values())
+                min_service_time = (tmax + tmin)/2
+                max_service_time = (3*tmax - tmin)/2
+                service_times = min_service_time + torch.rand(size-1) * (max_service_time - min_service_time)
+                self.data.append({'loc': loc, 'depot': depot, 'service_time': torch.cat([torch.zeros(1), service_times], dim=0)})
 
-            loc_with_depot = torch.cat((depot[None, :], loc),  0)
-            distances = {(i, j): torch.hypot(loc_with_depot[i, 0] - loc_with_depot[j, 0], loc_with_depot[i, 1] - loc_with_depot[j, 1]) for i in nodes for j in nodes if i != j}
-            #d_norm = (loc_with_depot[1:] - loc_with_depot[:-1]).norm(p=2, dim=1)
 
-            tmax, tmin = max(distances.values()), min(distances.values())
-            min_service_time = (tmax + tmin)/2
-            max_service_time = (3*tmax - tmin)/2
-            service_times = min_service_time + torch.rand(size-1) * (max_service_time - min_service_time)
-
-
-            self.data = [
-                {
-                    'loc': loc,
-                    'depot': depot,
-                    'service_time': torch.cat([torch.zeros(1), service_times], dim=0)
-                }
-                for i in range(num_samples)
-            ]
+#            self.data = [
+#                {
+#                    'loc': loc,
+#                    'depot': depot,
+#                    'service_time': torch.cat([torch.zeros(1), service_times], dim=0)
+#                }
+#                for i in range(num_samples)
+#            ]
 
         self.size = len(self.data)
 
