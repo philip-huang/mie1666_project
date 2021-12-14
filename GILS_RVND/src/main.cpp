@@ -9,7 +9,9 @@
 using namespace std;
 
 double ** distanceMatrix; 
-int dimension; 
+int dimension;
+bool warm_start;
+vector<int> warm_start_sol;
 
 struct insertionInfo{
   int insertedNode;
@@ -606,13 +608,22 @@ double search(int iIls, int dimension, ofstream &fout){
     vertices.push_back(i+1);
   }
 
-  for(int iterMax = 0; iterMax < 10; iterMax++){
+  int outerloopN = (warm_start)? 1 : 10;
+  for(int iterMax = 0; iterMax < outerloopN; iterMax++){
     double alpha = (rand() % 90) / 100.0 + 0.1;
 
-    currentSolution = construction(vertices, alpha); // Generates initial solution
+    if (warm_start) {
+      currentSolution = warm_start_sol;
+    }
+    else {
+      currentSolution = construction(vertices, alpha); // Generates initial solution
+    }
     updatesMatrix(subsequenceMatrix, currentSolution);
-
+    
+    currentCost = subsequenceMatrix[0][dimension].acumulateCost;
+    std::cout << currentCost << std::endl;
     bestCurrentSolution = currentSolution;
+    bestCurrentCost = currentCost;
 
     int iterIls = 0;
     while(iterIls < iIls){
@@ -650,8 +661,14 @@ double search(int iIls, int dimension, ofstream &fout){
 int main(int argc, char** argv) {
 
   clock_t start = clock(); // Starts time counting
-    
+  
   readNpData(argc, argv, &dimension, &distanceMatrix);
+  warm_start = false;
+  if (argc == 3) {
+    warm_start = true;
+    readRLSol(warm_start_sol, dimension, std::string(argv[2]));
+  }
+
   std::cout << "read successful" << std::endl;
   srand(time(NULL));
 
@@ -664,8 +681,12 @@ int main(int argc, char** argv) {
   }
 
   ofstream fout;
-  string filename (argv[1]);;
-  filename.append(".gilsrvndSol.txt");
+  string filename (argv[1]);
+  if (warm_start) {
+    filename.append(".rl_a_gilsSol.txt");
+  } else {
+    filename.append(".gilsrvndSol.txt");
+  }
   fout.open(filename);
 
   double cost = search(iIls, dimension, fout);
