@@ -664,9 +664,10 @@ int main(int argc, char** argv) {
   
   readNpData(argc, argv, &dimension, &distanceMatrix);
   warm_start = false;
+  double warm_time = 0;
   if (argc == 3) {
     warm_start = true;
-    readRLSol(warm_start_sol, dimension, std::string(argv[2]));
+    readRLSol(warm_start_sol, warm_time, dimension, std::string(argv[2]));
   }
 
   std::cout << "read successful" << std::endl;
@@ -696,9 +697,9 @@ int main(int argc, char** argv) {
   double time = ((double) (end - start)) / CLOCKS_PER_SEC;
 
   cout << endl << "Cost: " << cost << endl;
-  cout << "Time: " << time << endl << endl;
+  cout << "Time: " << warm_time + time << endl << endl;
   fout << cost << endl;
-  fout << time << endl;
+  fout << warm_time + time << endl;
     
   return 0;
 

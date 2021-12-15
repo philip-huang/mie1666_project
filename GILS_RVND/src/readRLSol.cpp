@@ -4,7 +4,7 @@
 #include <vector>
 
 using namespace std;
-void readRLSol(std::vector<int> &path, int n, std::string file)
+void readRLSol(std::vector<int> &path, double &runtime, int n, std::string file)
 {
     ifstream in(file, std::ifstream::in);
     if (!in)
@@ -20,5 +20,7 @@ void readRLSol(std::vector<int> &path, int n, std::string file)
         in >> node;
         path.push_back(node + 1);
     }
+    in >> runtime;
+    in >> runtime;
     in.close();
 }
