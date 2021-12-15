@@ -11,9 +11,9 @@ void readNpData( int argc, char** argv, int* Dimension, double ***Mdist ) {
         exit(1);
     }
 
-    if (argc > 2) {
+    if (argc > 3) {
         cout << "\nToo many parameters\n";
-        cout << " ./exec [path to npz instance] " << endl;
+        cout << " ./exec [path to npz instance] [path to partial solution]" << endl;
         exit(1);
     }
 

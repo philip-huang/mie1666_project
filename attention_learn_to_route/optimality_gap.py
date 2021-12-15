@@ -1,6 +1,7 @@
 import argparse
 import pickle
 import numpy as np
+import os
 
 
 def compute_optimality_gap(rl_results_path, optim_results_path):
@@ -21,6 +22,25 @@ def compute_optimality_gap(rl_results_path, optim_results_path):
     avg_optim_gap = ((rl_costs-optim_costs)/optim_costs).mean()
     print("Optimality gap: {:.5f}".format(avg_optim_gap))
 
+def write_tour_to_txt(rl_results_path, txt_path):
+    with open(rl_results_path, 'rb') as f:
+        results, eval_batch_size = pickle.load(f)
+        rl_costs, tours, durations = zip(*results)
+
+        rl_costs = np.array(rl_costs)
+
+        ids = sorted([str(i) for i in range(len(tours))])
+        for i in range(len(tours)):
+            size = len(tours[i])
+            path = os.path.join(txt_path, f'{size}_{ids[i]}.npz.rl_a.solution.txt')
+            print(path)
+            with open(path, 'w') as f:
+                for node in tours[i]:
+                    f.write('%d\n' % node)
+                f.write('%f\n' % rl_costs[i])
+                f.write('%f\n' % durations[i])
+
+        print("Tour written to txt files.")
 
 if __name__ == "__main__":
 
@@ -32,9 +52,13 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--rl_results_path', help="path to rl eval results", required=True)
-    parser.add_argument('--optim_results_path', help="path to optimal cost results", required=True)
+    parser.add_argument('--optim_results_path', help="path to optimal cost results", required=False)
+    parser.add_argument('--txt_path', help="path to write tour to txt files", required=False)
 
     args = parser.parse_args()
 
-    compute_optimality_gap(args.rl_results_path, args.optim_results_path)
+    if args.optim_results_path:
+        compute_optimality_gap(args.rl_results_path, args.optim_results_path)
 
+    if args.txt_path:
+        write_tour_to_txt(args.rl_results_path, args.txt_path)

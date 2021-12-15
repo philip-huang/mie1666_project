@@ -11,7 +11,7 @@ import torch.nn.functional as F
 
 
 def load_problem(name):
-    from problems import TSP, CVRP, SDVRP, OP, PCTSPDet, PCTSPStoch, MLP
+    from problems import TSP, CVRP, SDVRP, OP, PCTSPDet, PCTSPStoch, MLP, MLP_S1, MLP_S2
     problem = {
         'tsp': TSP,
         'cvrp': CVRP,
@@ -20,6 +20,8 @@ def load_problem(name):
         'pctsp_det': PCTSPDet,
         'pctsp_stoch': PCTSPStoch,
         'mlp': MLP,
+        'mlp_s1': MLP_S1,
+        'mlp_s2': MLP_S2,
     }.get(name, None)
     assert problem is not None, "Currently unsupported problem: {}!".format(name)
     return problem
