@@ -621,7 +621,6 @@ double search(int iIls, int dimension, ofstream &fout){
     updatesMatrix(subsequenceMatrix, currentSolution);
     
     currentCost = subsequenceMatrix[0][dimension].acumulateCost;
-    std::cout << currentCost << std::endl;
     bestCurrentSolution = currentSolution;
     bestCurrentCost = currentCost;
 
