@@ -9,7 +9,7 @@ for instance in ../data/test-optimal/S0/*.npz; do
 	echo "Running $instance"
 	echo "Instance $k"
 
-	./mlp ${instance}
+	./mlp ${instance} #${instance}.rl_a.solution.txt
 
 	k=$(($k + 1))
 done

@@ -1,0 +1,2 @@
+,id,has_incumbent,current_objective,best_bound,mip_gap,current_nb_iterations,current_nb_nodes,remaining_nb_nodes,time,det_time
+0,1,1,24.71890952534068,12.286680939688344,0.5029440547471198,242,0,1,0.012608051300048828,12.981528282165527
