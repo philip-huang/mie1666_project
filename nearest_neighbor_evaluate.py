@@ -1,5 +1,5 @@
 from mlp_data_gen import load_mlp_instance_from_fpath
-from nearest_neighbor import compute_cost, solve_nearest_neighbor, solve_nearest_neighbor_softmax_temp, solve_sampling
+from nearest_neighbor import compute_cost, solve_nearest_neighbor, solve_nearest_neighbor_softmax_parallel, solve_sampling
 import time
 
 def solve_from_fpath(solve_fn, fpath):
@@ -10,7 +10,7 @@ def solve_from_fpath(solve_fn, fpath):
 
 
 def evaluate(mode, fpath):
-    solve_fn = solve_nearest_neighbor if mode == 'normal' else lambda cost: solve_sampling(solve_nearest_neighbor_softmax_temp, cost, N=5000, T=5)
+    solve_fn = solve_nearest_neighbor if mode == 'normal' else lambda cost: solve_nearest_neighbor_softmax_parallel(cost, M=1280)
     start_time = time.time()
     solution, cost = solve_from_fpath(solve_fn, fpath)
     elapsed = time.time() - start_time
