@@ -1,4 +1,4 @@
-# mie1666_project
+# Learning Heuristics for Minimum Latency Problem with RL and GNN
 
 Solve the minimum latency problem (MLP) with graph neural networks + RL. Group work by 
 
